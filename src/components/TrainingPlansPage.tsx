@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import planningVideo from '../assets/videos/BackgroundForPlanning.mp4'
 import Navigation from './Navigation'
+import plan1Image from '../assets/images/1.jpg'
+import plan2Image from '../assets/images/2.jpg'
+import plan4Image from '../assets/images/4.jpg'
+import plan5Image from '../assets/images/5.jpg'
+import plan6Image from '../assets/images/6.jpg'
+import plan7Image from '../assets/images/7.jpg'
+import plan8Image from '../assets/images/8.jpg'
 
 function TrainingPlansPage() {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const video = document.getElementById('planning-background-video') as HTMLVideoElement
@@ -14,6 +23,10 @@ function TrainingPlansPage() {
     }
   }, [])
 
+  const handleStartPlan = (planId: number) => {
+    navigate(`/training-plan/${planId}`)
+  }
+
   const trainingPlans = [
     {
       id: 1,
@@ -22,7 +35,8 @@ function TrainingPlansPage() {
       duration: "8-12 weeks",
       difficulty: "Beginner to Intermediate",
       icon: "🔥",
-      features: ["Cardio workouts", "Strength training", "Nutrition guidance", "Progress tracking"]
+      features: ["Cardio workouts", "Strength training", "Nutrition guidance", "Progress tracking"],
+      imageUrl: plan1Image
     },
     {
       id: 2,
@@ -31,7 +45,8 @@ function TrainingPlansPage() {
       duration: "12-16 weeks",
       difficulty: "Intermediate to Advanced",
       icon: "💪",
-      features: ["Compound movements", "Progressive overload", "Recovery protocols", "Form coaching"]
+      features: ["Compound movements", "Progressive overload", "Recovery protocols", "Form coaching"],
+      imageUrl: plan2Image
     },
     {
       id: 3,
@@ -40,7 +55,8 @@ function TrainingPlansPage() {
       duration: "16-20 weeks",
       difficulty: "Intermediate",
       icon: "🏋️",
-      features: ["Volume training", "Isolation exercises", "Nutrition plans", "Rest optimization"]
+      features: ["Volume training", "Isolation exercises", "Nutrition plans", "Rest optimization"],
+      imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&h=600&fit=crop"
     },
     {
       id: 4,
@@ -49,7 +65,8 @@ function TrainingPlansPage() {
       duration: "6-10 weeks",
       difficulty: "All Levels",
       icon: "❤️",
-      features: ["HIIT training", "Steady state cardio", "Heart rate monitoring", "Endurance building"]
+      features: ["HIIT training", "Steady state cardio", "Heart rate monitoring", "Endurance building"],
+      imageUrl: plan4Image
     },
     {
       id: 5,
@@ -58,7 +75,8 @@ function TrainingPlansPage() {
       duration: "4-8 weeks",
       difficulty: "All Levels",
       icon: "🧘",
-      features: ["Stretching routines", "Mobility drills", "Recovery techniques", "Injury prevention"]
+      features: ["Stretching routines", "Mobility drills", "Recovery techniques", "Injury prevention"],
+      imageUrl: plan5Image
     },
     {
       id: 6,
@@ -67,7 +85,8 @@ function TrainingPlansPage() {
       duration: "12-16 weeks",
       difficulty: "Intermediate to Advanced",
       icon: "⚽",
-      features: ["Sport-specific drills", "Power training", "Agility work", "Performance testing"]
+      features: ["Sport-specific drills", "Power training", "Agility work", "Performance testing"],
+      imageUrl: plan6Image
     },
     {
       id: 7,
@@ -76,7 +95,8 @@ function TrainingPlansPage() {
       duration: "8-12 weeks",
       difficulty: "All Levels",
       icon: "🏃",
-      features: ["Movement patterns", "Core stability", "Balance training", "Real-world applications"]
+      features: ["Movement patterns", "Core stability", "Balance training", "Real-world applications"],
+      imageUrl: plan7Image
     },
     {
       id: 8,
@@ -85,7 +105,8 @@ function TrainingPlansPage() {
       duration: "Ongoing",
       difficulty: "Beginner",
       icon: "👴",
-      features: ["Low-impact exercises", "Balance training", "Strength maintenance", "Safety focus"]
+      features: ["Low-impact exercises", "Balance training", "Strength maintenance", "Safety focus"],
+      imageUrl: plan8Image
     }
   ]
 
@@ -124,6 +145,9 @@ function TrainingPlansPage() {
         <div className="training-plans-grid">
           {trainingPlans.map((plan) => (
             <div key={plan.id} className="training-plan-card">
+              <div className="plan-image">
+                <img src={plan.imageUrl} alt={plan.name} />
+              </div>
               <div className="plan-header">
                 <div className="plan-icon">{plan.icon}</div>
                 <h3>{plan.name}</h3>
@@ -138,7 +162,10 @@ function TrainingPlansPage() {
                   <li key={index}>{feature}</li>
                 ))}
               </ul>
-              <button className="btn btn-primary plan-btn">
+              <button 
+                className="btn btn-primary plan-btn"
+                onClick={() => handleStartPlan(plan.id)}
+              >
                 Start This Plan
               </button>
             </div>

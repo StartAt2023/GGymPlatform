@@ -2,7 +2,7 @@ import Navigation from './Navigation'
 
 function ContactPage() {
   return (
-    <div className="page-container">
+    <div className="page-container contact-page">
       <Navigation />
 
       <main className="page-main">

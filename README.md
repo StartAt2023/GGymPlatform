@@ -1,100 +1,150 @@
-# GGymPlatform
+# GGym Platform
 
-一个基于 React + TypeScript + Vite 的健身房平台项目。
+A comprehensive fitness training platform built with React + TypeScript + Vite.
 
-## 技术栈
+## Features
 
-- React 19.1.0
-- TypeScript 5.8.3
-- Vite 6.3.5
-- ESLint
+- 🏋️‍♂️ **Professional Training Plans**: 8 different workout programs for various fitness levels
+- 🎥 **Video Backgrounds**: Engaging video backgrounds for immersive experience
+- 📱 **Responsive Design**: Optimized for all devices and screen sizes
+- ⚡ **Fast Performance**: Built with Vite for optimal loading speeds
+- 🎨 **Modern UI**: Clean and professional design
 
-## 开发
+## Tech Stack
+
+- **Frontend**: React 19.1.0
+- **Language**: TypeScript 5.8.3
+- **Build Tool**: Vite 6.3.5
+- **Routing**: React Router DOM 7.6.2
+- **Styling**: CSS3
+- **Linting**: ESLint
+
+## Quick Start
+
+### Prerequisites
+- Node.js >= 18.0.0
+- npm >= 9.0.0
+
+### Development
 
 ```bash
-# 安装依赖
+# Install dependencies
 npm install
 
-# 启动开发服务器
+# Start development server
 npm run dev
 
-# 构建生产版本
-npm run build
+# Build for production
+npm run build:prod
 
-# 预览生产版本
+# Preview production build
 npm run preview
 
-# 代码检查
+# Run linting
 npm run lint
+
+# Type checking
+npm run type-check
 ```
 
-## 项目结构
+## Project Structure
 
 ```
 GGymPlatform/
-├── public/          # 静态资源
-├── src/             # 源代码
-│   ├── assets/      # 资源文件
-│   ├── App.tsx      # 主应用组件
-│   ├── main.tsx     # 应用入口
-│   └── index.css    # 全局样式
-├── index.html       # HTML模板
-├── package.json     # 项目配置
-├── tsconfig.json    # TypeScript配置
-└── vite.config.ts   # Vite配置
+├── public/              # Static assets
+├── src/                 # Source code
+│   ├── assets/          # Images and videos
+│   │   ├── images/      # Image files
+│   │   └── videos/      # Video files
+│   ├── components/      # React components
+│   │   ├── HomePage.tsx
+│   │   ├── AboutPage.tsx
+│   │   ├── ContactPage.tsx
+│   │   ├── TrainingPlansPage.tsx
+│   │   ├── TrainingPlanDetail.tsx
+│   │   └── Navigation.tsx
+│   ├── App.tsx          # Main app component
+│   ├── main.tsx         # App entry point
+│   └── index.css        # Global styles
+├── index.html           # HTML template
+├── package.json         # Project configuration
+├── tsconfig.json        # TypeScript configuration
+├── vite.config.ts       # Vite configuration
+├── vercel.json          # Vercel deployment configuration
+└── DEPLOYMENT.md        # Deployment guide
 ```
 
-# React + TypeScript + Vite
+## Pages
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- **Home**: Landing page with video background
+- **Training Plans**: Overview of all available workout programs
+- **Training Plan Detail**: Detailed information for each training plan
+- **About**: Information about the platform
+- **Contact**: Contact information and form
 
-Currently, two official plugins are available:
+## Deployment
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Vercel (Recommended)
 
-## Expanding the ESLint configuration
+1. **Connect Repository**
+   - Go to [vercel.com](https://vercel.com)
+   - Sign up/Login with GitHub
+   - Click "New Project"
+   - Import your repository
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. **Configure Build Settings**
+   - Build Command: `npm run build:prod`
+   - Output Directory: `dist`
+   - Framework Preset: Vite
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+3. **Deploy**
+   - Click "Deploy"
+   - Your site will be live at `https://your-project.vercel.app`
+
+### Manual Deployment
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Login to Vercel
+vercel login
+
+# Deploy
+vercel --prod
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Environment Variables
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Create a `.env` file in the root directory:
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```env
+VITE_APP_TITLE=GGym Platform
+VITE_APP_VERSION=1.0.0
+VITE_API_BASE_URL=https://api.ggymplatform.com
+VITE_SHOP_URL=https://shop.ggymplatform.com
 ```
+
+## Performance Optimizations
+
+- ✅ Code splitting for optimal loading
+- ✅ Image and video optimization
+- ✅ Static asset caching
+- ✅ SEO optimization
+- ✅ Responsive design
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License.
+
+## Support
+
+For support and questions, please refer to the [Deployment Guide](DEPLOYMENT.md) or contact the development team.
