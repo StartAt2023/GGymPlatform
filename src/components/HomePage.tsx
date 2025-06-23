@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { db } from '../firebase'
+import { collection, query, where, getDocs, limit } from 'firebase/firestore'
 import backgroundVideo from '../assets/videos/HomePageBackground.mp4'
 import Navigation from './Navigation'
 
 function HomePage() {
   const [isVideoLoaded, setIsVideoLoaded] = useState(false)
+  const [todayWorkout, setTodayWorkout] = useState<any>(null)
   const navigate = useNavigate()
+  const { currentUser } = useAuth()
 
   useEffect(() => {
     const video = document.getElementById('background-video') as HTMLVideoElement
@@ -15,6 +20,34 @@ function HomePage() {
       })
     }
   }, [])
+
+  // Fetch today's completed workout from Firestore
+  useEffect(() => {
+    const fetchTodayWorkout = async () => {
+      if (!currentUser) {
+        setTodayWorkout(null)
+        return
+      }
+
+      const today = new Date().toDateString()
+      const completedWorkoutsRef = collection(db, 'users', currentUser.uid, 'completedWorkouts')
+      const q = query(completedWorkoutsRef, where("completedAt", "==", today), limit(1))
+      
+      const querySnapshot = await getDocs(q)
+      if (!querySnapshot.empty) {
+        const docData = querySnapshot.docs[0].data()
+        setTodayWorkout({
+          planName: docData.planName,
+          icon: docData.icon,
+          day: docData.day
+        })
+      } else {
+        setTodayWorkout(null)
+      }
+    }
+
+    fetchTodayWorkout()
+  }, [currentUser])
 
   const handleGetStarted = () => {
     navigate('/training-plans')
@@ -70,6 +103,22 @@ function HomePage() {
               </button>
             </div>
           </div>
+
+          {/* Today's Completed Workout */}
+          {todayWorkout && (
+            <div className="today-completed-section">
+              <div className="today-completed-card">
+                <div className="completed-icon">🎉</div>
+                <h3>Today's Achievement</h3>
+                <div className="completed-workout-info">
+                  <span className="workout-icon">{todayWorkout.icon}</span>
+                  <span className="workout-name">{todayWorkout.planName}</span>
+                  <span className="workout-day">({todayWorkout.day})</span>
+                </div>
+                <p className="congratulations">Congratulations! You've completed today's workout!</p>
+              </div>
+            </div>
+          )}
 
           {/* Features Section */}
           <div className="features-section">

@@ -18,21 +18,14 @@ function ContactPage() {
               <span className="contact-icon">📧</span>
               <div>
                 <h3>Email</h3>
-                <p>support@ggymplatform.com</p>
+                <p>jamesaudaily2000@gmail.com</p>
               </div>
             </div>
             <div className="contact-item">
               <span className="contact-icon">📞</span>
               <div>
                 <h3>Phone</h3>
-                <p>+1 (555) 123-4567</p>
-              </div>
-            </div>
-            <div className="contact-item">
-              <span className="contact-icon">📍</span>
-              <div>
-                <h3>Address</h3>
-                <p>123 Fitness Street, Health City, HC 12345</p>
+                <p>+61 434216007</p>
               </div>
             </div>
           </div>

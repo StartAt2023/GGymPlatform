@@ -1,16 +1,181 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 import planningVideo from '../assets/videos/BackgroundForPlanning.mp4'
 import Navigation from './Navigation'
 import plan1Image from '../assets/images/1.jpg'
 import plan2Image from '../assets/images/2.jpg'
 import plan4Image from '../assets/images/4.jpg'
+import { useAuth } from '../contexts/AuthContext'
+import { db } from '../firebase'
+import { collection, addDoc, query, where, getDocs, serverTimestamp, orderBy } from 'firebase/firestore'
 
 function TrainingPlanDetail() {
-  const { planId } = useParams()
+  const { id } = useParams()
   const navigate = useNavigate()
+  const { currentUser } = useAuth()
   const [isVideoLoaded, setIsVideoLoaded] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<any>(null)
+  const [todayWorkout, setTodayWorkout] = useState<any>(null)
+  const [completedWorkouts, setCompletedWorkouts] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
+
+  // YouTube训练视频链接
+  const workoutVideos = {
+    "Cardio HIIT": "https://www.youtube.com/watch?v=ml6cT4AZdqI",
+    "Strength Training": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Active Recovery": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Cardio Steady State": "https://www.youtube.com/watch?v=ml6cT4AZdqI",
+    "Flexibility & Mobility": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Push Day (Chest, Shoulders, Triceps)": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Pull Day (Back, Biceps)": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Legs Day": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Chest & Triceps": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Back & Biceps": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Legs": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Shoulders & Arms": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Chest & Back": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Legs & Core": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "HIIT Cardio": "https://www.youtube.com/watch?v=ml6cT4AZdqI",
+    "Steady State Cardio": "https://www.youtube.com/watch?v=ml6cT4AZdqI",
+    "Interval Training": "https://www.youtube.com/watch?v=ml6cT4AZdqI",
+    "Recovery Cardio": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Long Distance Cardio": "https://www.youtube.com/watch?v=ml6cT4AZdqI",
+    "Upper Body Mobility": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Lower Body Stretching": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Full Body Flow": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Hip & Spine Mobility": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Recovery & Relaxation": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Active Stretching": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Power Training": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Sport-Specific Skills": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Agility & Speed": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Game Simulation": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Push/Pull Patterns": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Squat & Lunge Patterns": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Core & Stability": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Hip Hinge Patterns": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Balance & Coordination": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Full Body Integration": "https://www.youtube.com/watch?v=3VcKaXpzqRo",
+    "Gentle Strength Training": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Low-Impact Cardio": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Strength Maintenance": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw",
+    "Light Walking": "https://www.youtube.com/watch?v=Gc4eQHd2Lgw"
+  }
+
+  // 获取今天的星期几
+  const getTodayWorkout = () => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    const today = days[new Date().getDay()]
+    return selectedPlan?.weeklySchedule.find((day: any) => day.day === today)
+  }
+
+  const handleStartTodayWorkout = () => {
+    const workout = getTodayWorkout();
+    setTodayWorkout(workout);
+  };
+
+  // 生成PDF
+  const generatePDF = async () => {
+    if (!selectedPlan) return
+
+    const pdf = new jsPDF('p', 'mm', 'a4')
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    const margin = 20
+
+    // 标题
+    pdf.setFontSize(24)
+    pdf.setTextColor(0, 212, 255)
+    pdf.text(selectedPlan.name, pageWidth / 2, 30, { align: 'center' })
+
+    // 描述
+    pdf.setFontSize(12)
+    pdf.setTextColor(85, 85, 85)
+    pdf.text(selectedPlan.description, margin, 50)
+
+    // 基本信息
+    pdf.setFontSize(14)
+    pdf.setTextColor(0, 0, 0)
+    pdf.text(`Duration: ${selectedPlan.duration}`, margin, 70)
+    pdf.text(`Difficulty: ${selectedPlan.difficulty}`, margin, 80)
+
+    // 周计划表
+    pdf.setFontSize(16)
+    pdf.setTextColor(0, 212, 255)
+    pdf.text('Weekly Schedule', margin, 100)
+
+    pdf.setFontSize(10)
+    pdf.setTextColor(0, 0, 0)
+    let yPosition = 115
+
+    selectedPlan.weeklySchedule.forEach((day: any, index: number) => {
+      if (yPosition > pageHeight - 40) {
+        pdf.addPage()
+        yPosition = 20
+      }
+
+      pdf.setFontSize(12)
+      pdf.setTextColor(0, 212, 255)
+      pdf.text(`${day.day}:`, margin, yPosition)
+      
+      pdf.setFontSize(10)
+      pdf.setTextColor(0, 0, 0)
+      pdf.text(`${day.workout} - ${day.duration}`, margin + 30, yPosition)
+      
+      yPosition += 8
+    })
+
+    // 营养指南
+    if (yPosition > pageHeight - 80) {
+      pdf.addPage()
+      yPosition = 20
+    }
+
+    pdf.setFontSize(16)
+    pdf.setTextColor(0, 212, 255)
+    pdf.text('Nutrition Guidelines', margin, yPosition + 10)
+
+    pdf.setFontSize(10)
+    pdf.setTextColor(0, 0, 0)
+    yPosition += 25
+
+    selectedPlan.nutritionGuidelines.forEach((guideline: string) => {
+      if (yPosition > pageHeight - 20) {
+        pdf.addPage()
+        yPosition = 20
+      }
+      pdf.text(`• ${guideline}`, margin, yPosition)
+      yPosition += 6
+    })
+
+    // 设备清单
+    if (yPosition > pageHeight - 60) {
+      pdf.addPage()
+      yPosition = 20
+    }
+
+    pdf.setFontSize(16)
+    pdf.setTextColor(0, 212, 255)
+    pdf.text('Equipment Needed', margin, yPosition + 10)
+
+    pdf.setFontSize(10)
+    pdf.setTextColor(0, 0, 0)
+    yPosition += 25
+
+    selectedPlan.equipment.forEach((item: string) => {
+      if (yPosition > pageHeight - 20) {
+        pdf.addPage()
+        yPosition = 20
+      }
+      pdf.text(`• ${item}`, margin, yPosition)
+      yPosition += 6
+    })
+
+    // 保存PDF
+    pdf.save(`${selectedPlan.name.replace(/\s+/g, '_')}_Training_Plan.pdf`)
+  }
 
   useEffect(() => {
     const video = document.getElementById('plan-detail-background-video') as HTMLVideoElement
@@ -22,7 +187,7 @@ function TrainingPlanDetail() {
   }, [])
 
   useEffect(() => {
-    // 根据planId获取对应的训练计划详情
+    // 根据id获取对应的训练计划详情
     const planDetails = {
       "1": {
         id: 1,
@@ -32,7 +197,6 @@ function TrainingPlanDetail() {
         difficulty: "Beginner to Intermediate",
         icon: "🔥",
         features: ["Cardio workouts", "Strength training", "Nutrition guidance", "Progress tracking"],
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
         imageUrl: plan1Image,
         weeklySchedule: [
           { day: "Monday", workout: "Cardio HIIT", duration: "45 min" },
@@ -60,7 +224,6 @@ function TrainingPlanDetail() {
         difficulty: "Intermediate to Advanced",
         icon: "💪",
         features: ["Compound movements", "Progressive overload", "Recovery protocols", "Form coaching"],
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
         imageUrl: plan2Image,
         weeklySchedule: [
           { day: "Monday", workout: "Push Day (Chest, Shoulders, Triceps)", duration: "75 min" },
@@ -88,7 +251,6 @@ function TrainingPlanDetail() {
         difficulty: "Intermediate",
         icon: "🏋️",
         features: ["Volume training", "Isolation exercises", "Nutrition plans", "Rest optimization"],
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
         imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
         weeklySchedule: [
           { day: "Monday", workout: "Chest & Triceps", duration: "90 min" },
@@ -116,7 +278,6 @@ function TrainingPlanDetail() {
         difficulty: "All Levels",
         icon: "❤️",
         features: ["HIIT training", "Steady state cardio", "Heart rate monitoring", "Endurance building"],
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
         imageUrl: plan4Image,
         weeklySchedule: [
           { day: "Monday", workout: "HIIT Cardio", duration: "30 min" },
@@ -144,7 +305,6 @@ function TrainingPlanDetail() {
         difficulty: "All Levels",
         icon: "🧘",
         features: ["Stretching routines", "Mobility drills", "Recovery techniques", "Injury prevention"],
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
         imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
         weeklySchedule: [
           { day: "Monday", workout: "Upper Body Mobility", duration: "30 min" },
@@ -172,7 +332,6 @@ function TrainingPlanDetail() {
         difficulty: "Intermediate to Advanced",
         icon: "⚽",
         features: ["Sport-specific drills", "Power training", "Agility work", "Performance testing"],
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
         imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
         weeklySchedule: [
           { day: "Monday", workout: "Power Training", duration: "60 min" },
@@ -200,7 +359,6 @@ function TrainingPlanDetail() {
         difficulty: "All Levels",
         icon: "🏃",
         features: ["Movement patterns", "Core stability", "Balance training", "Real-world applications"],
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
         imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
         weeklySchedule: [
           { day: "Monday", workout: "Push/Pull Patterns", duration: "45 min" },
@@ -228,7 +386,6 @@ function TrainingPlanDetail() {
         difficulty: "Beginner",
         icon: "👴",
         features: ["Low-impact exercises", "Balance training", "Strength maintenance", "Safety focus"],
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
         imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
         weeklySchedule: [
           { day: "Monday", workout: "Gentle Strength Training", duration: "30 min" },
@@ -250,13 +407,65 @@ function TrainingPlanDetail() {
       }
     }
 
-    const plan = planDetails[planId as keyof typeof planDetails]
-    if (plan) {
-      setSelectedPlan(plan)
+    if (id && planDetails[id as keyof typeof planDetails]) {
+      setSelectedPlan(planDetails[id as keyof typeof planDetails])
     } else {
-      navigate('/training-plans')
+      // 如果找不到计划，可以导航回列表页或显示错误信息
+      // navigate('/training-plans')
     }
-  }, [planId, navigate])
+    setLoading(false)
+  }, [id, navigate])
+
+  // Fetch completed workouts from Firestore
+  useEffect(() => {
+    const fetchCompletedWorkouts = async () => {
+      if (!currentUser) return;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const q = query(
+        collection(db, 'users', currentUser.uid, 'completedWorkouts'),
+        where('date', '>=', today)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      const completedToday = querySnapshot.docs.map(doc => doc.data().day);
+      setCompletedWorkouts(completedToday);
+    };
+
+    if (currentUser) {
+      fetchCompletedWorkouts();
+    }
+  }, [currentUser]);
+
+  const markTodayAsCompleted = async () => {
+    const todayWorkout = getTodayWorkout();
+    if (!currentUser || !todayWorkout || isTodayCompleted()) return;
+
+    try {
+      const historyRef = collection(db, 'users', currentUser.uid, 'completedWorkouts');
+      await addDoc(historyRef, {
+        planId: selectedPlan.id,
+        planName: selectedPlan.name,
+        day: todayWorkout.day,
+        date: serverTimestamp(), // Correctly use server timestamp
+      });
+      setCompletedWorkouts(prev => [...prev, todayWorkout.day]);
+    } catch (error) {
+      console.error("Error marking workout as completed: ", error);
+    }
+  };
+
+  const isWorkoutCompleted = (day: string) => {
+    return completedWorkouts.includes(day);
+  }
+
+  const isTodayCompleted = () => {
+    const todayWorkout = getTodayWorkout()
+    if (!todayWorkout || !selectedPlan) return false
+    const todayKey = `${selectedPlan.id}-${todayWorkout.day}-${new Date().toDateString()}`
+    return completedWorkouts.includes(todayWorkout.day)
+  }
 
   if (!selectedPlan) {
     return <div>Loading...</div>
@@ -304,15 +513,207 @@ function TrainingPlanDetail() {
         <div className="plan-detail-content">
           {/* Video Section */}
           <section className="plan-detail-section">
-            <h2>Training Preview</h2>
-            <div className="video-container">
-              <iframe
-                src={selectedPlan.videoUrl}
-                title="Training Preview"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+            <h2>Training Overview</h2>
+            <div className="training-overview">
+              {selectedPlan.id === 1 && (
+                <div className="overview-content">
+                  <h3>Weight Loss Training Program</h3>
+                  <p>This comprehensive weight loss program combines high-intensity cardio workouts with strength training to maximize fat burning and build lean muscle. The program follows a progressive approach, starting with foundational movements and gradually increasing intensity.</p>
+                  <div className="key-points">
+                    <h4>Key Training Principles:</h4>
+                    <ul>
+                      <li><strong>HIIT Cardio:</strong> High-intensity interval training to boost metabolism and burn calories efficiently</li>
+                      <li><strong>Strength Training:</strong> Compound movements to build muscle and increase resting metabolic rate</li>
+                      <li><strong>Active Recovery:</strong> Low-intensity activities to promote recovery and maintain momentum</li>
+                      <li><strong>Progressive Overload:</strong> Gradually increasing workout intensity to continue seeing results</li>
+                    </ul>
+                  </div>
+                  <div className="training-tips">
+                    <h4>Training Tips:</h4>
+                    <ul>
+                      <li>Focus on form over speed, especially when starting</li>
+                      <li>Stay hydrated throughout your workouts</li>
+                      <li>Listen to your body and adjust intensity as needed</li>
+                      <li>Track your progress to stay motivated</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+              
+              {selectedPlan.id === 2 && (
+                <div className="overview-content">
+                  <h3>Strength Training Program</h3>
+                  <p>This advanced strength training program focuses on compound movements and progressive overload to build maximum strength and muscle mass. The program uses a push-pull-legs split to ensure balanced development.</p>
+                  <div className="key-points">
+                    <h4>Key Training Principles:</h4>
+                    <ul>
+                      <li><strong>Compound Movements:</strong> Multi-joint exercises that recruit multiple muscle groups</li>
+                      <li><strong>Progressive Overload:</strong> Gradually increasing weight or reps to stimulate growth</li>
+                      <li><strong>Proper Form:</strong> Emphasizing technique to prevent injury and maximize results</li>
+                      <li><strong>Recovery Focus:</strong> Adequate rest between sessions for optimal muscle repair</li>
+                    </ul>
+                  </div>
+                  <div className="training-tips">
+                    <h4>Training Tips:</h4>
+                    <ul>
+                      <li>Always warm up properly before heavy lifts</li>
+                      <li>Focus on controlled movements with proper breathing</li>
+                      <li>Gradually increase weight while maintaining form</li>
+                      <li>Allow 48-72 hours between training the same muscle group</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+              
+              {selectedPlan.id === 3 && (
+                <div className="overview-content">
+                  <h3>Muscle Building Program</h3>
+                  <p>This hypertrophy-focused program is designed for maximum muscle growth through high-volume training and targeted isolation exercises. The program emphasizes muscle time under tension and metabolic stress.</p>
+                  <div className="key-points">
+                    <h4>Key Training Principles:</h4>
+                    <ul>
+                      <li><strong>Volume Training:</strong> High sets and reps to maximize muscle stimulation</li>
+                      <li><strong>Isolation Exercises:</strong> Targeted movements to focus on specific muscle groups</li>
+                      <li><strong>Time Under Tension:</strong> Controlled movements to increase muscle fiber recruitment</li>
+                      <li><strong>Supersets:</strong> Combining exercises to increase training density</li>
+                    </ul>
+                  </div>
+                  <div className="training-tips">
+                    <h4>Training Tips:</h4>
+                    <ul>
+                      <li>Focus on the mind-muscle connection during exercises</li>
+                      <li>Use moderate weights with higher rep ranges (8-15)</li>
+                      <li>Include both compound and isolation movements</li>
+                      <li>Ensure adequate protein intake for muscle repair</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+              
+              {selectedPlan.id === 4 && (
+                <div className="overview-content">
+                  <h3>Cardio Fitness Program</h3>
+                  <p>This comprehensive cardio program improves cardiovascular health and endurance through a variety of training methods. The program includes HIIT, steady-state cardio, and interval training to build a strong aerobic base.</p>
+                  <div className="key-points">
+                    <h4>Key Training Principles:</h4>
+                    <ul>
+                      <li><strong>HIIT Training:</strong> High-intensity intervals to improve cardiovascular efficiency</li>
+                      <li><strong>Steady State:</strong> Moderate-intensity cardio to build endurance</li>
+                      <li><strong>Heart Rate Zones:</strong> Training in different zones for optimal results</li>
+                      <li><strong>Progressive Overload:</strong> Gradually increasing duration and intensity</li>
+                    </ul>
+                  </div>
+                  <div className="training-tips">
+                    <h4>Training Tips:</h4>
+                    <ul>
+                      <li>Monitor your heart rate during workouts</li>
+                      <li>Start with shorter sessions and gradually increase duration</li>
+                      <li>Vary your cardio activities to prevent boredom</li>
+                      <li>Stay hydrated and fuel properly for longer sessions</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+              
+              {selectedPlan.id === 5 && (
+                <div className="overview-content">
+                  <h3>Flexibility & Mobility Program</h3>
+                  <p>This program focuses on improving flexibility, joint mobility, and overall movement quality. The program combines static stretching, dynamic movements, and mobility drills to enhance range of motion and prevent injury.</p>
+                  <div className="key-points">
+                    <h4>Key Training Principles:</h4>
+                    <ul>
+                      <li><strong>Static Stretching:</strong> Hold positions to improve muscle length</li>
+                      <li><strong>Dynamic Mobility:</strong> Movement-based exercises to improve joint range</li>
+                      <li><strong>Recovery Focus:</strong> Techniques to reduce muscle tension and soreness</li>
+                      <li><strong>Injury Prevention:</strong> Addressing common movement limitations</li>
+                    </ul>
+                  </div>
+                  <div className="training-tips">
+                    <h4>Training Tips:</h4>
+                    <ul>
+                      <li>Breathe deeply and relax into stretches</li>
+                      <li>Never force a stretch beyond your comfort level</li>
+                      <li>Be consistent - flexibility takes time to develop</li>
+                      <li>Include both warm-up and cool-down routines</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+              
+              {selectedPlan.id === 6 && (
+                <div className="overview-content">
+                  <h3>Sports Performance Program</h3>
+                  <p>This sport-specific training program enhances athletic performance through power training, agility work, and sport-specific drills. The program is designed to improve speed, power, and overall athletic ability.</p>
+                  <div className="key-points">
+                    <h4>Key Training Principles:</h4>
+                    <ul>
+                      <li><strong>Power Training:</strong> Explosive movements to improve force production</li>
+                      <li><strong>Agility Work:</strong> Multi-directional movements and quick changes of direction</li>
+                      <li><strong>Sport-Specific Skills:</strong> Movements that mimic your sport's demands</li>
+                      <li><strong>Performance Testing:</strong> Regular assessments to track progress</li>
+                    </ul>
+                  </div>
+                  <div className="training-tips">
+                    <h4>Training Tips:</h4>
+                    <ul>
+                      <li>Focus on quality over quantity in power movements</li>
+                      <li>Allow adequate recovery between high-intensity sessions</li>
+                      <li>Practice sport-specific movements regularly</li>
+                      <li>Monitor performance metrics to track improvement</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+              
+              {selectedPlan.id === 7 && (
+                <div className="overview-content">
+                  <h3>Functional Fitness Program</h3>
+                  <p>This program improves daily movement patterns and overall functionality through exercises that mimic real-world activities. The program focuses on core stability, balance, and movement efficiency.</p>
+                  <div className="key-points">
+                    <h4>Key Training Principles:</h4>
+                    <ul>
+                      <li><strong>Movement Patterns:</strong> Exercises that improve daily functional movements</li>
+                      <li><strong>Core Stability:</strong> Strengthening the body's center for better movement</li>
+                      <li><strong>Balance Training:</strong> Improving stability and coordination</li>
+                      <li><strong>Real-World Application:</strong> Movements that translate to daily life</li>
+                    </ul>
+                  </div>
+                  <div className="training-tips">
+                    <h4>Training Tips:</h4>
+                    <ul>
+                      <li>Focus on proper movement patterns over heavy weights</li>
+                      <li>Include single-leg and single-arm exercises</li>
+                      <li>Practice movements that challenge your balance</li>
+                      <li>Think about how exercises apply to daily activities</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+              
+              {selectedPlan.id === 8 && (
+                <div className="overview-content">
+                  <h3>Senior Fitness Program</h3>
+                  <p>This age-appropriate program focuses on maintaining health, independence, and quality of life through safe and effective exercises. The program emphasizes balance, strength maintenance, and low-impact activities.</p>
+                  <div className="key-points">
+                    <h4>Key Training Principles:</h4>
+                    <ul>
+                      <li><strong>Low-Impact Exercises:</strong> Joint-friendly movements that reduce stress</li>
+                      <li><strong>Balance Training:</strong> Exercises to improve stability and prevent falls</li>
+                      <li><strong>Strength Maintenance:</strong> Preserving muscle mass and bone density</li>
+                      <li><strong>Safety Focus:</strong> Prioritizing injury prevention and proper form</li>
+                    </ul>
+                  </div>
+                  <div className="training-tips">
+                    <h4>Training Tips:</h4>
+                    <ul>
+                      <li>Always consult with healthcare providers before starting</li>
+                      <li>Start slowly and progress gradually</li>
+                      <li>Use support when needed (chairs, walls, etc.)</li>
+                      <li>Focus on consistency rather than intensity</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
@@ -320,13 +721,17 @@ function TrainingPlanDetail() {
           <section className="plan-detail-section">
             <h2>Weekly Schedule</h2>
             <div className="weekly-schedule">
-              {selectedPlan.weeklySchedule.map((day: any, index: number) => (
-                <div key={index} className="schedule-day">
-                  <div className="day-name">{day.day}</div>
-                  <div className="day-workout">{day.workout}</div>
-                  <div className="day-duration">{day.duration}</div>
-                </div>
-              ))}
+              {selectedPlan.weeklySchedule.map((day: any, index: number) => {
+                const isCompleted = isWorkoutCompleted(day.day)
+                return (
+                  <div key={index} className={`schedule-day ${isCompleted ? 'completed' : ''}`}>
+                    <div className="day-name">{day.day}</div>
+                    <div className="day-workout">{day.workout}</div>
+                    <div className="day-duration">{day.duration}</div>
+                    {isCompleted && <div className="completion-badge">Done</div>}
+                  </div>
+                )
+              })}
             </div>
           </section>
 
@@ -358,14 +763,55 @@ function TrainingPlanDetail() {
               <button className="btn btn-primary" onClick={() => navigate('/training-plans')}>
                 Back to Plans
               </button>
-              <button className="btn btn-secondary">
+              <button className="btn btn-secondary" onClick={generatePDF}>
                 Download PDF Guide
               </button>
-              <button className="btn btn-primary">
+              <button className="btn btn-primary" onClick={handleStartTodayWorkout}>
                 Start This Program
               </button>
             </div>
           </section>
+
+          {/* Today's Workout Section */}
+          {todayWorkout !== null && (
+            <section className="plan-detail-section" id="today-workout-section">
+              <h2 className="today-workout-title">Today's Workout: {todayWorkout ? todayWorkout.day : 'Rest Day'}</h2>
+              {todayWorkout && todayWorkout.workout !== "Rest Day" ? (
+                <div className="workout-card">
+                  <div className="workout-header">
+                    <h3>{todayWorkout.workout}</h3>
+                    <span className="workout-duration">{todayWorkout.duration}</span>
+                  </div>
+                  <div className="workout-content">
+                    <p>Follow the video for a guided session. Focus on your form and breathing.</p>
+                    <a 
+                      href={workoutVideos[todayWorkout.workout as keyof typeof workoutVideos] || '#'} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="workout-video-link"
+                    >
+                      Watch Today's Workout Video
+                    </a>
+                    {!isTodayCompleted() ? (
+                      <div className="completion-section">
+                        <button className="btn btn-success" onClick={markTodayAsCompleted}>
+                          Completed Today's Task
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="completion-section">
+                        <p className="completed-message">You've completed today's task. Well done!</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="no-workout">
+                  <p>Today is a rest day. Enjoy your recovery!</p>
+                </div>
+              )}
+            </section>
+          )}
         </div>
       </main>
 

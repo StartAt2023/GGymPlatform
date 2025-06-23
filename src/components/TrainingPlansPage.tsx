@@ -24,7 +24,7 @@ function TrainingPlansPage() {
   }, [])
 
   const handleStartPlan = (planId: number) => {
-    navigate(`/training-plan/${planId}`)
+    navigate(`/training-plans/${planId}`)
   }
 
   const trainingPlans = [

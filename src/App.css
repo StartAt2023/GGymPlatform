@@ -188,6 +188,66 @@
   display: inline-block;
 }
 
+/* 导航栏按钮样式 - 更紧凑 */
+.btn-nav {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  line-height: 1;
+}
+
+.btn-nav-primary {
+  background: linear-gradient(135deg, #00d4ff, #0099cc);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+}
+
+.btn-nav-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+}
+
+.btn-nav-secondary {
+  background: transparent;
+  color: white;
+  border: 1px solid white;
+}
+
+.btn-nav-secondary:hover {
+  background: white;
+  color: black;
+  transform: translateY(-1px);
+}
+
+/* 导航栏特定按钮样式 */
+.btn-nav-profile {
+  background: #6c757d;
+  color: white;
+  border: none;
+}
+
+.btn-nav-profile:hover {
+  background: #5a6268;
+  color: white;
+}
+
+.btn-nav-logout {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+}
+
+.btn-nav-logout:hover {
+  background: #ff3333;
+  color: white;
+}
+
 .btn-primary {
   background: linear-gradient(135deg, #00d4ff, #0099cc);
   color: white;
@@ -511,6 +571,7 @@
   border-radius: 10px;
   padding: 1rem;
   text-align: center;
+  position: relative;
 }
 
 .day-name {
@@ -859,4 +920,765 @@
   .nav-logo h2 {
     font-size: 1rem;
   }
+}
+
+/* 训练概览样式 */
+.training-overview {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.overview-content h3 {
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.overview-content p {
+  color: #555;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+  text-align: justify;
+}
+
+.key-points, .training-tips {
+  margin-bottom: 2rem;
+}
+
+.key-points h4, .training-tips h4 {
+  color: #00d4ff;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  border-bottom: 2px solid #00d4ff;
+  padding-bottom: 0.5rem;
+}
+
+.key-points ul, .training-tips ul {
+  list-style: none;
+  padding: 0;
+}
+
+.key-points li, .training-tips li {
+  color: #444;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 0.8rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.key-points li:before, .training-tips li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #00d4ff;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.key-points strong {
+  color: #333;
+  font-weight: 600;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .training-overview {
+    padding: 1.5rem;
+    margin: 0 1rem;
+  }
+  
+  .overview-content h3 {
+    font-size: 1.5rem;
+  }
+  
+  .overview-content p {
+    font-size: 1rem;
+  }
+  
+  .key-points h4, .training-tips h4 {
+    font-size: 1.2rem;
+  }
+  
+  .key-points li, .training-tips li {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .training-overview {
+    padding: 1rem;
+    margin: 0 0.5rem;
+  }
+  
+  .overview-content h3 {
+    font-size: 1.3rem;
+  }
+  
+  .overview-content p {
+    font-size: 0.95rem;
+  }
+  
+  .key-points h4, .training-tips h4 {
+    font-size: 1.1rem;
+  }
+  
+  .key-points li, .training-tips li {
+    font-size: 0.9rem;
+    padding-left: 1.2rem;
+  }
+}
+
+/* 今日训练样式 */
+.today-workout {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.no-workout {
+  text-align: center;
+  padding: 2rem;
+}
+
+.no-workout p {
+  color: #666;
+  font-size: 1.1rem;
+  font-style: italic;
+}
+
+.workout-card {
+  background: linear-gradient(135deg, #00d4ff, #0099cc);
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.workout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.workout-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.workout-duration {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.workout-content h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.workout-content p {
+  margin: 0 0 1.5rem 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+.workout-video-link {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  text-decoration: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.workout-video-link:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .today-workout {
+    padding: 1.5rem;
+    margin: 0 1rem;
+  }
+  
+  .workout-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .workout-header h3 {
+    font-size: 1.2rem;
+  }
+  
+  .workout-content h4 {
+    font-size: 1.4rem;
+  }
+  
+  .workout-video-link {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .today-workout {
+    padding: 1rem;
+    margin: 0 0.5rem;
+  }
+  
+  .workout-card {
+    padding: 1rem;
+  }
+  
+  .workout-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .workout-content h4 {
+    font-size: 1.2rem;
+  }
+  
+  .workout-content p {
+    font-size: 0.9rem;
+  }
+  
+  .workout-video-link {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* 完成状态样式 */
+.schedule-day.completed {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.schedule-day.completed .day-name,
+.schedule-day.completed .day-workout,
+.schedule-day.completed .day-duration {
+  color: white;
+}
+
+.completion-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #4CAF50;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.completion-section {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.completed-message {
+  background: rgba(76, 175, 80, 0.2);
+  color: white;
+  padding: 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  border: 2px solid rgba(76, 175, 80, 0.5);
+}
+
+/* 主页今日完成训练样式 */
+.today-completed-section {
+  margin: 3rem 0;
+  display: flex;
+  justify-content: center;
+}
+
+.today-completed-card {
+  background: linear-gradient(135deg, #4CAF50, #45a049);
+  color: white;
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(76, 175, 80, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 500px;
+  width: 100%;
+}
+
+.completed-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.today-completed-card h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.completed-workout-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.workout-icon {
+  font-size: 1.5rem;
+}
+
+.workout-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.workout-day {
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+.congratulations {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .today-completed-card {
+    padding: 1.5rem;
+    margin: 0 1rem;
+  }
+  
+  .completed-icon {
+    font-size: 2.5rem;
+  }
+  
+  .today-completed-card h3 {
+    font-size: 1.3rem;
+  }
+  
+  .workout-name {
+    font-size: 1rem;
+  }
+  
+  .completed-workout-info {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .today-completed-card {
+    padding: 1rem;
+    margin: 0 0.5rem;
+  }
+  
+  .completed-icon {
+    font-size: 2rem;
+  }
+  
+  .today-completed-card h3 {
+    font-size: 1.2rem;
+  }
+  
+  .workout-name {
+    font-size: 0.9rem;
+  }
+  
+  .congratulations {
+    font-size: 0.9rem;
+  }
+}
+
+/* 导航栏用户部分 */
+.nav-logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: white;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white;
+}
+
+.user-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: white;
+}
+
+/* Updated Profile Page Styles */
+.profile-main {
+  color: white;
+}
+
+.profile-main .page-header h1 {
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* 全新现代化认证页面样式 */
+.auth-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  padding: 2rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 450px;
+  background: rgba(15, 15, 25, 0.75);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 3rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  color: white;
+}
+
+.auth-card h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 2rem;
+}
+
+.auth-card .form-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.auth-card .form-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 0.5rem;
+}
+
+.auth-card .form-group input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 1rem;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.auth-card .form-group input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #00d4ff;
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+  outline: none;
+}
+
+.auth-card .btn-primary,
+.auth-card .btn-google {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.auth-card .btn-primary {
+  margin-top: 1rem;
+}
+
+.btn-google {
+  background: white;
+  color: #333;
+}
+
+.btn-google:hover {
+  background: #f0f0f0;
+}
+
+.auth-divider {
+  margin: 2rem 0;
+  position: relative;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.auth-divider::before {
+    left: 0;
+}
+
+.auth-divider::after {
+    right: 0;
+}
+
+.auth-switch {
+  margin-top: 2rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.auth-switch a {
+  color: #00d4ff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+.auth-error {
+  background: rgba(255, 77, 77, 0.2);
+  border: 1px solid rgba(255, 77, 77, 0.5);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* New Profile Page Styles */
+.profile-form-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+}
+
+.profile-form {
+  margin-bottom: 2rem;
+}
+
+.profile-form h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #00d4ff;
+}
+
+.auth-success {
+  background: rgba(76, 175, 80, 0.2);
+  border: 1px solid rgba(76, 175, 80, 0.5);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Dropdown Menu Styles */
+.user-info-dropdown {
+  position: relative;
+}
+
+.user-info-trigger {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition: background-color 0.2s ease;
+}
+
+.user-info-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-arrow {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  color: #00d4ff;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: rgba(20, 30, 40, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  list-style: none;
+  padding: 0.5rem 0;
+  margin: 0.5rem 0 0;
+  min-width: 150px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+.dropdown-menu li a,
+.dropdown-menu li button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1.5rem;
+  color: white;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.dropdown-menu li a:hover,
+.dropdown-menu li button:hover {
+  background-color: rgba(0, 212, 255, 0.2);
+}
+
+.btn-logout-dropdown {
+  color: #ff4d4d !important;
+  font-weight: 600;
+}
+
+/* History Page Styles */
+.history-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.history-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.history-item-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #00d4ff, #0099cc);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  margin-right: 1.5rem;
+  flex-shrink: 0;
+}
+
+.history-item-details {
+  flex: 1;
+}
+
+.history-item-details h3 {
+  margin: 0 0 0.5rem 0;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.history-item-details p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.loading-text {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+  font-style: italic;
 } 
